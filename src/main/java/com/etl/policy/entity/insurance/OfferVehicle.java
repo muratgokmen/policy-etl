@@ -1,11 +1,19 @@
 package com.etl.policy.entity.insurance;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "offer_vehicle", uniqueConstraints = @UniqueConstraint(columnNames = "chassis_no"))
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OfferVehicle {
     @Id
     @GeneratedValue

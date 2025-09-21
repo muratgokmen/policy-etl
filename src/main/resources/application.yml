@@ -1,12 +1,12 @@
 spring:
   application:
-    name: order-batch
+    name: policy-etl
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/order-batch   # kendi DB adın/hostun/portun
-    username: postgres                                  # kendi kullanıcı adın
-    password: postgres                                  # kendi şifren
+    url: jdbc:postgresql://localhost:5432/policy_etl_db   # policy-etl database
+    username: postgres                                     # kendi kullanıcı adın
+    password: postgres                                     # kendi şifren
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2

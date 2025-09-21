@@ -1,6 +1,6 @@
 package com.etl.policy.dto.batch.event;
 
-import com.etl.policy.enumeration.BatchStatusEnum;
+import com.etl.policy.enums.BatchStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

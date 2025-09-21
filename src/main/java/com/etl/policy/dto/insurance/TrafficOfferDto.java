@@ -1,4 +1,4 @@
-package com.batch.example.dto.insurance;
+package com.etl.policy.dto.insurance;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

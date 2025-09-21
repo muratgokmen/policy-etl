@@ -1,6 +1,0 @@
-package com.etl.policy.repository;
-
-import com.etl.policy.entity.insurance.ParseRun;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface ParseRunRepository extends JpaRepository<ParseRun, Long> {}

@@ -1,5 +1,6 @@
 package com.etl.policy.entity.insurance;
 
+import com.etl.policy.entity.document.PdfStore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
