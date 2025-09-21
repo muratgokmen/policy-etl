@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: order-batch
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/order-batch   # kendi DB adın/hostun/portun
+    username: postgres                                  # kendi kullanıcı adın
+    password: postgres                                  # kendi şifren
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: update            # dev için pratik; prod'da validate önerilir
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc.time_zone: UTC
+        # dialect belirtmeye gerek yok; auto-detect çalışır. İstersen aç:
+        # dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+  batch:
+    job:
+      enabled: false              # uygulama açıldığında job otomatik koşmasın
+    jdbc:
+      initialize-schema: always   # Spring Batch tablolarını Postgres'te oluştur
+
+logging:
+  level:
+    root: INFO
+    org.springframework.batch: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+
+# Mail’i kapatmak için bizden bir bayrak (aşağıdaki kod değişikliği ile uyumlu)
+app:
+  mail:
+    enabled: false
