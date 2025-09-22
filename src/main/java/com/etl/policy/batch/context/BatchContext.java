@@ -11,7 +11,6 @@ public final class BatchContext {
     public static BatchEventDto getCurrentBatchEvent() { return HOLDER.get(); }
     public static void clear() { HOLDER.remove(); }
 
-    // Payload eklemek için kolay helper
     public static void attachPayload(String referenceId, Object payload) {
         BatchEventDto batch = getCurrentBatchEvent();
         if (batch == null || referenceId == null) return;
