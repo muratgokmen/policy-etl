@@ -38,9 +38,9 @@ spring:
 
   batch:
     job:
-      enabled: false
+      enabled: false  # Manuel başlatma için false
     jdbc:
-      initialize-schema: always
+      initialize-schema: never  # Tablolar manuel oluşturuldu
 
 logging:
   level:

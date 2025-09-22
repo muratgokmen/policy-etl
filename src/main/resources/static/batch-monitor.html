@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Job Monitor - Policy ETL</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .control-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .status-panel {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .failed { color: #dc3545; font-weight: bold; }
+        .running { color: #007bff; font-weight: bold; }
+        .completed { color: #28a745; font-weight: bold; }
+        .stopped { color: #6c757d; font-weight: bold; }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .metric-box {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 5px;
+            border-left: 3px solid #007bff;
+        }
+        .metric-label {
+            display: block;
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Batch Job Monitor</h1>
+        
+        <div class="control-panel">
+            <h3>📊 Batch Job Kontrolü</h3>
+            <button id="startBatchBtn" onclick="startBatch()">🚀 PDF Processing Batch'ini Başlat</button>
+            <button id="refreshStatusBtn" onclick="refreshStatus()">🔄 Status Yenile</button>
+        </div>
+
+        <div id="result" class="result"></div>
+        
+        <div id="statusPanel" class="status-panel" style="display: none;">
+            <h3>📈 Son Job Durumu</h3>
+            <div id="jobInfo"></div>
+            <div id="stepMetrics"></div>
+            <div id="stepDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentJobExecutionId = null;
+        let refreshInterval = null;
+
+        async function startBatch() {
+            const startBtn = document.getElementById('startBatchBtn');
+            startBtn.disabled = true;
+            startBtn.textContent = '⏳ Başlatılıyor...';
+            
+            try {
+                const response = await fetch('/api/batch/start-pdf-processing', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentJobExecutionId = result.jobExecutionId;
+                    showResult(`✅ Batch job başarıyla başlatıldı!<br>
+                               Job Execution ID: ${result.jobExecutionId}<br>
+                               Status: <span class="${result.status.toLowerCase()}">${result.status}</span>`, 'success');
+                    
+                    document.getElementById('statusPanel').style.display = 'block';
+                    
+                    // Auto-refresh başlat
+                    startAutoRefresh();
+                } else {
+                    showResult(`❌ Batch job başlatılamadı: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Bağlantı hatası: ${error.message}`, 'error');
+            }
+            
+            startBtn.disabled = false;
+            startBtn.textContent = '🚀 PDF Processing Batch\'ini Başlat';
+        }
+
+        async function refreshStatus() {
+            if (!currentJobExecutionId) {
+                showResult('❌ Önce bir batch job başlatın', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/batch/status/${currentJobExecutionId}`);
+                
+                if (response.ok) {
+                    const status = await response.json();
+                    updateStatusDisplay(status);
+                } else {
+                    showResult('❌ Job status alınamadı', 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Status yenileme hatası: ${error.message}`, 'error');
+            }
+        }
+
+        function updateStatusDisplay(status) {
+            const jobInfo = document.getElementById('jobInfo');
+            const stepMetrics = document.getElementById('stepMetrics');
+            const stepDetails = document.getElementById('stepDetails');
+            
+            // Job genel bilgileri
+            const duration = status.duration ? `${(status.duration / 1000).toFixed(1)} saniye` : 'Devam ediyor';
+            const startTime = status.startTime ? new Date(status.startTime).toLocaleString('tr-TR') : '-';
+            const endTime = status.endTime ? new Date(status.endTime).toLocaleString('tr-TR') : '-';
+            
+            jobInfo.innerHTML = `
+                <h4>Job Bilgileri</h4>
+                <p><strong>Job Name:</strong> ${status.jobName}</p>
+                <p><strong>Execution ID:</strong> ${status.jobExecutionId}</p>
+                <p><strong>Status:</strong> <span class="${status.status.toLowerCase()}">${status.status}</span></p>
+                <p><strong>Exit Status:</strong> <span class="${status.exitStatus.toLowerCase()}">${status.exitStatus}</span></p>
+                <p><strong>Başlangıç:</strong> ${startTime}</p>
+                <p><strong>Bitiş:</strong> ${endTime}</p>
+                <p><strong>Süre:</strong> ${duration}</p>
+            `;
+            
+            // Step metrikleri
+            let metricsHtml = '<h4>Step Metrikleri</h4>';
+            for (const [stepName, stepData] of Object.entries(status.steps)) {
+                metricsHtml += `
+                    <div class="metric-box">
+                        <span class="metric-label">${stepName} - Okunan</span>
+                        <span class="metric-value">${stepData.readCount}</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Yazılan</span>
+                        <span class="metric-value">${stepData.writeCount}</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Commit</span>
+                        <span class="metric-value">${stepData.commitCount}</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-label">Skip</span>
+                        <span class="metric-value">${stepData.skipCount}</span>
+                    </div>
+                `;
+            }
+            stepMetrics.innerHTML = metricsHtml;
+            
+            // Step detayları
+            let detailsHtml = '<h4>Step Detayları</h4><table><tr><th>Step Name</th><th>Status</th><th>Read</th><th>Write</th><th>Skip</th><th>Rollback</th></tr>';
+            for (const [stepName, stepData] of Object.entries(status.steps)) {
+                detailsHtml += `
+                    <tr>
+                        <td>${stepName}</td>
+                        <td><span class="${stepData.status.toLowerCase()}">${stepData.status}</span></td>
+                        <td>${stepData.readCount}</td>
+                        <td>${stepData.writeCount}</td>
+                        <td>${stepData.skipCount}</td>
+                        <td>${stepData.rollbackCount}</td>
+                    </tr>
+                `;
+            }
+            detailsHtml += '</table>';
+            stepDetails.innerHTML = detailsHtml;
+            
+            // Job tamamlandıysa auto-refresh'i durdur
+            if (status.status === 'COMPLETED' || status.status === 'FAILED' || status.status === 'STOPPED') {
+                stopAutoRefresh();
+            }
+        }
+
+        function startAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            refreshInterval = setInterval(refreshStatus, 2000); // 2 saniyede bir yenile
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+            
+            // 8 saniye sonra gizle
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 8000);
+        }
+
+        // Sayfa kapatıldığında auto-refresh'i durdur
+        window.addEventListener('beforeunload', stopAutoRefresh);
+    </script>
+</body>
+</html>
