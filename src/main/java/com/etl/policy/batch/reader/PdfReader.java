@@ -23,4 +23,5 @@ public class PdfReader implements ItemReader<PdfStore> {
     }
     return it.hasNext() ? it.next() : null;
   }
+
 }

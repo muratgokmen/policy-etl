@@ -4,7 +4,6 @@ import com.etl.policy.annotation.BatchProcess;
 import com.etl.policy.batch.context.BatchContext;
 import com.etl.policy.dto.batch.event.BatchEventDetailDto;
 import com.etl.policy.dto.batch.event.BatchEventDto;
-import com.etl.policy.dto.batch.payload.OrderPayload;
 import com.etl.policy.enums.BatchStatusEnum;
 import com.etl.policy.notification.email.EmailService;
 import com.etl.policy.service.batch.BatchEventService;
@@ -77,7 +76,7 @@ public class BatchProcessAspect {
         sb.append("<table border='1'><tr><th>Order</th><th>Status</th><th>Total</th></tr>");
 
         ObjectMapper om = new ObjectMapper();
-        for (BatchEventDetailDto d : batch.getBatchEventDetailList()) {
+        /*for (BatchEventDetailDto d : batch.getBatchEventDetailList()) {
             OrderPayload payload = null;
             try {
                 if (d.getPayloadJson() != null) {
@@ -90,7 +89,7 @@ public class BatchProcessAspect {
               .append("<td>").append(d.getStatus()).append("</td>")
               .append("<td>").append(payload != null ? payload.getTotalAmount() : "-").append("</td>")
               .append("</tr>");
-        }
+        }*/
 
         sb.append("</table>");
         return sb.toString();

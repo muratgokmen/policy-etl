@@ -37,4 +37,5 @@ public record TrafficOfferDto(
         // Prim & Teminatlar
         Map<String, BigDecimal> coverages,   // "Araç Başına Maddi" -> 300000.00
         Map<String, BigDecimal> premiums     // "Brüt Prim" -> 11585.14 vb.
-) {}
+) {
+}
