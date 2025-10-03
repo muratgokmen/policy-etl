@@ -72,6 +72,7 @@ public class TrafficKaskoParser {
   }
 
   // DTO
+  //TODO move to dto package
   public static class ParsedOffer {
     public String insurerName, insurerAddress, agentName, agentRegistryNo, agentAddress;
     public String customerName, customerIdMasked;

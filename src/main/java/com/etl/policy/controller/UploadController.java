@@ -34,8 +34,7 @@ public class UploadController {
             return ResponseEntity.ok(text);
         } catch (Exception e) {
             log.error("Error extracting text from PDF", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("PDF metin çıkarma hatası: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF metin çıkarma hatası: " + e.getMessage());
         }
     }
 
@@ -45,8 +44,7 @@ public class UploadController {
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "sourceName", required = false) String sourceName) {
         
-        log.info("PDF upload request - Filename: {}, Size: {} bytes, SourceName: {}", 
-                file.getOriginalFilename(), file.getSize(), sourceName);
+        log.info("PDF upload request - Filename: {}, Size: {} bytes, SourceName: {}", file.getOriginalFilename(), file.getSize(), sourceName);
         
         PdfUploadResponse response = pdfStoreService.uploadPdf(file, sourceName);
         

@@ -13,11 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
-public class TrafficOfferController {
+public class CarInsuranceController {
 
     private final TrafficOfferService service;
 
-    public TrafficOfferController(TrafficOfferService service) {
+    public CarInsuranceController(TrafficOfferService service) {
         this.service = service;
     }
 
