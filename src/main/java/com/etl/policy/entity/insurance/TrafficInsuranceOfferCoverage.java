@@ -9,19 +9,23 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "offer_coverages",
+@Table(name = "TRAFFIC_INSURANCE_OFFER_COVERAGE",
         uniqueConstraints = @UniqueConstraint(columnNames = {"header_id", "coverage_key"}))
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OfferCoverage {
+public class TrafficInsuranceOfferCoverage {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "header_id")
-    private OfferHeader header;
+    private TrafficInsuranceOffer header;
+
     private String coverageKey;
+
     private BigDecimal coverageValue;
+
 }

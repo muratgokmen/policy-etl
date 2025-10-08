@@ -16,14 +16,15 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 public class PdfText {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pdf_id", unique = true)
     private PdfStore pdf;
 
-    @Lob
+    // PostgreSQL TEXT - no @Lob needed
+    @Column(columnDefinition = "TEXT")
     private String text;
 
     private boolean ocrApplied;

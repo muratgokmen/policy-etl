@@ -9,27 +9,39 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "offer_vehicle", uniqueConstraints = @UniqueConstraint(columnNames = "chassis_no"))
+@Table(name = "TRAFFIC_INSURANCE_OFFER_VEHICLE", uniqueConstraints = @UniqueConstraint(columnNames = "chassis_no"))
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OfferVehicle {
+public class TrafficInsuranceOfferVehicle {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "header_id")
-    private OfferHeader header;
+    private TrafficInsuranceOffer header;
+
     private String plate;
+
     private String brand;
+
     private String type;
+
     private String engineNo;
+
     @Column(name = "chassis_no")
     private String chassisNo;
+
     private Integer modelYear;
+
     private LocalDate registrationDate;
+
     private String usageType;
+
     private Integer seatCount;
+
     private String step;
+
 }

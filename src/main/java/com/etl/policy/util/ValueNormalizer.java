@@ -28,6 +28,22 @@ public final class ValueNormalizer {
         return m.find() ? Integer.valueOf(m.group(1)) : null;
     }
 
+    public static Long parseLongSafe(String s) {
+        if (s == null) return null;
+        Matcher m = Pattern.compile("(-?\\d+)").matcher(s);
+        return m.find() ? Long.valueOf(m.group(1)) : null;
+    }
+
+    public static Boolean parseBoolean(String s) {
+        if (s == null || s.isBlank()) return null;
+        String normalized = s.trim().toLowerCase();
+        return switch (normalized) {
+            case "true", "yes", "y", "1", "evet", "e" -> true;
+            case "false", "no", "n", "0", "hayır", "h" -> false;
+            default -> null;
+        };
+    }
+
     public static LocalDate parseDate(String s) {
         if (s == null) return null;
         List<DateTimeFormatter> fs = List.of(

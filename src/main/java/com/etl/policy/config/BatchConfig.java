@@ -3,8 +3,8 @@ package com.etl.policy.config;
 import com.etl.policy.batch.processor.PdfProcessor;
 import com.etl.policy.batch.reader.PdfReader;
 import com.etl.policy.batch.writer.PdfWriter;
-import com.etl.policy.entity.document.PdfStore;
-import com.etl.policy.parser.TrafficKaskoParser;
+import com.etl.policy.dto.insurance.TrafficInsuranceOfferDto;
+import com.etl.policy.entity.document.PdfText;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -35,7 +35,7 @@ public class BatchConfig {
                         PdfProcessor processor,
                         PdfWriter writer) {
     return new StepBuilder("parseStep", repo)
-        .<PdfStore, TrafficKaskoParser.ParsedOffer>chunk(10, tx)
+        .<PdfText, TrafficInsuranceOfferDto>chunk(10, tx)
         .reader(reader)
         .processor(processor)
         .writer(writer)

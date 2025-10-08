@@ -10,13 +10,9 @@ import java.util.Optional;
 
 public interface PdfStoreRepository extends JpaRepository<PdfStore, Long> {
   
-  @Query("""
-    select s from PdfStore s
-    where not exists (
-      select 1 from ParseRun r where r.pdf = s and r.status = 'SUCCESS'
-    )
-    order by s.receivedAt
-  """)
+  // Simplified: returns all PDFs ordered by received date
+  // TODO: Future enhancement - add processing status tracking if needed
+  @Query("select s from PdfStore s order by s.receivedAt")
   List<PdfStore> findUnprocessed();
   
   @Query("select p from PdfStore p where p.contentSha256 = :sha256")

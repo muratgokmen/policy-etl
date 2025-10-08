@@ -40,4 +40,45 @@ docker-compose down -v
 
 ## Init Scripts
 
-`init-scripts/` dizinindeki SQL dosyaları PostgreSQL container'ı ilk kez başlatıldığında otomatik olarak çalıştırılır.
+`init-scripts/` dizinindeki SQL dosyaları PostgreSQL container'ı ilk kez başlatıldığında **alfabetik sıra** ile otomatik olarak çalıştırılır:
+
+1. **01-init-database.sql** - Database, extension'lar ve log tablosu
+2. **02-spring-batch-schema.sql** - Spring Batch meta tabloları
+3. **03-create-tables.sql** - 🔥 **Ana application şeması (MANUAL)**
+4. **99-rollback-schema.sql** - Rollback scripti (sadece development)
+
+⚠️ **ÖNEMLİ**: Spring Boot `ddl-auto: validate` ile çalışır. Şema değişiklikleri otomatik yapılmaz!
+
+Detaylı bilgi için: [DATABASE_MIGRATION_GUIDE.md](DATABASE_MIGRATION_GUIDE.md)
+
+## Şema Yönetimi
+
+### İlk Kurulum
+```bash
+# Windows
+start-dev.bat
+
+# Linux/Mac  
+./start-dev.sh
+```
+
+Container başlatıldığında tüm tablolar, index'ler ve constraint'ler otomatik oluşur.
+
+### Yeni Migration Ekleme
+1. Yeni SQL dosyası oluştur: `docker/init-scripts/04-my-migration.sql`
+2. Mevcut DB'ye manuel uygula:
+   ```bash
+   psql -U postgres -d policy_etl_db -f docker/init-scripts/04-my-migration.sql
+   ```
+3. Git'e commit et
+
+### Şemayı Tamamen Sıfırlama (DEV ONLY!)
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+
+Veya manuel rollback:
+```bash
+psql -U postgres -d policy_etl_db -f docker/init-scripts/99-rollback-schema.sql
+```

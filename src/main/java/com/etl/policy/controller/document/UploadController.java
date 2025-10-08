@@ -1,4 +1,4 @@
-package com.etl.policy.controller;
+package com.etl.policy.controller.document;
 
 import com.etl.policy.dto.document.PdfUploadResponse;
 import com.etl.policy.entity.document.PdfStore;
@@ -39,9 +39,9 @@ public class UploadController {
     }
 
     // PDF dosyasını veritabanına yükler
-    @PostMapping(value = "/upload-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/upload-pdf")
     public ResponseEntity<PdfUploadResponse> uploadPdf(
-            @RequestPart("file") MultipartFile file,
+            @RequestParam("file") MultipartFile file,
             @RequestParam(value = "sourceName", required = false) String sourceName) {
         
         log.info("PDF upload request - Filename: {}, Size: {} bytes, SourceName: {}", file.getOriginalFilename(), file.getSize(), sourceName);

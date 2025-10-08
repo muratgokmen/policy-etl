@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableScheduling
 @RequiredArgsConstructor
-public class PdfIngestScheduler {
+public class PdfETLScheduler {
 
     private final JobLauncher jobLauncher;
     private final Job pdfIngestJob;

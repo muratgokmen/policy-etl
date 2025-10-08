@@ -1,3 +1,6 @@
+server:
+  port: 8081  # pgAdmin 8080'de çalışıyor, bu yüzden 8081 kullanıyoruz
+
 spring:
   application:
     name: policy-etl
@@ -22,7 +25,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate  # validate: Entity'ler ile DB şemasını doğrular, değiştirmez
+      # none: Hiçbir şey yapmaz (daha katı)
     open-in-view: false
     properties:
       hibernate:
@@ -48,6 +52,7 @@ logging:
     org.springframework.batch: INFO
     org.hibernate.SQL: WARN
     org.hibernate.orm.jdbc.bind: WARN
+    com.etl.policy: DEBUG  # Uygulama log'larını ayrıntılı göster
 
 app:
   mail:

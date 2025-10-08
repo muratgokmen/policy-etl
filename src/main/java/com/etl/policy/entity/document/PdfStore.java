@@ -16,14 +16,14 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 public class PdfStore {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private String sourceName;
 
   private String filename;
 
-  @Lob
+  // PostgreSQL BYTEA - no @Lob needed
   private byte[] content;
 
   @Column(length=64, nullable=false)
